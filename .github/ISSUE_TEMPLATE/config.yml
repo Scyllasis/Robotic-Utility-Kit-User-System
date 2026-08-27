@@ -1,0 +1,12 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Security problem
+    url: https://github.com/Scyllasis/Robotic-Utility-Kit-User-System/security/advisories/new
+    about: >-
+      Do NOT open a normal issue. This board is public and an issue here is a public
+      disclosure. Report it privately here instead.
+  - name: Install or update trouble
+    url: https://github.com/Scyllasis/Robotic-Utility-Kit-User-System/blob/main/INSTALL.md
+    about: >-
+      SmartScreen warnings, checksum mismatches and "cannot reach any robot" are covered at
+      the bottom of the install guide.

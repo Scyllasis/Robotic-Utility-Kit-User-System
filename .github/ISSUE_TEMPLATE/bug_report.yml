@@ -1,0 +1,96 @@
+name: Bug report
+description: Something in RUKUS does not work, or does the wrong thing.
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting this.
+
+        **If this is a security problem, stop and read [SECURITY.md](../blob/main/SECURITY.md)
+        instead.** This board is public and an issue here is a public disclosure.
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What did you do, and what did RUKUS do instead of what you expected?
+      placeholder: |
+        I ticked four robots and ran a cluster backup. Three finished and the fourth
+        sat at "Waiting..." forever. No error appeared.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected instead
+      placeholder: The fourth robot to either back up or report why it could not.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to get there
+      description: |
+        The most useful thing in the whole report. If you can get it to happen again from a
+        cold start, say exactly how — that turns a maybe into a fix.
+      placeholder: |
+        1. Open RUKUS on a cluster with 4 robots
+        2. Tools > Bulk Operations
+        3. Tick all four, choose "Set speed override", value 50
+        4. Press Preview, then Run
+        5. Fourth robot never leaves "Waiting..."
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: RUKUS version
+      description: "**Help > About** shows it. Please give the exact string, including any -beta suffix."
+      placeholder: 0.9.0-beta.1
+    validations:
+      required: true
+
+  - type: dropdown
+    id: robot-kind
+    attributes:
+      label: What were you connected to?
+      description: This matters more than it looks — a lot of behaviour differs between a virtual controller and real hardware.
+      options:
+        - Real FANUC hardware
+        - ROBOGUIDE virtual controller (VRC)
+        - Both
+        - Nothing connected / not applicable
+    validations:
+      required: true
+
+  - type: input
+    id: controller
+    attributes:
+      label: Controller software version
+      description: "If you know it. **Analyse > Robot Report**, or the teach pendant. e.g. V9.40P/81, SpotTool+"
+      placeholder: V9.40P/81, SpotTool+, R-2000iC/210L
+
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Diagnostics bundle
+      description: |
+        **System → Collect Diagnostics…** builds a zip with the logs, your settings and the
+        crash log. Drag it into this box.
+
+        It contains your robot names and IP addresses. It does **not** contain robot
+        passwords. If those addresses are sensitive, say so and we will work without it.
+      placeholder: Drag the zip here, or say why you would rather not attach one.
+
+  - type: checkboxes
+    id: writes
+    attributes:
+      label: Did this involve writing to a controller?
+      options:
+        - label: This happened during a write (bulk operation, register/variable edit, file send, clock or override set)
+        - label: The robot ended up in a state I did not intend

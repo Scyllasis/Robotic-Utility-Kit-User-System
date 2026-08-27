@@ -1,0 +1,49 @@
+name: Idea or request
+description: Something RUKUS should do, or should do differently.
+title: "[Idea] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Ideas are welcome, especially ones that come from doing the job. The most useful
+        ones describe the **task**, not the feature — that leaves room for a better answer
+        than the one either of us thought of first.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What are you trying to do?
+      description: The job, not the button. What is tedious, or impossible, or easy to get wrong right now?
+      placeholder: |
+        After a line change I need to confirm all twelve robots got the new tool frame.
+        Right now that is opening Compare Robots eleven times.
+    validations:
+      required: true
+
+  - type: textarea
+    id: idea
+    attributes:
+      label: What you had in mind
+      description: Optional. If you already have a shape for it, say so.
+
+  - type: textarea
+    id: workaround
+    attributes:
+      label: How you handle it today
+      description: |
+        Including "I don't, I just accept it". Knowing the current cost is what says whether
+        this is worth building.
+
+  - type: dropdown
+    id: frequency
+    attributes:
+      label: How often does this come up?
+      options:
+        - Several times a day
+        - Weekly
+        - Every line change / changeover
+        - Occasionally
+        - Once, but it cost me hours
+    validations:
+      required: true

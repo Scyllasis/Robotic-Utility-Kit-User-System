@@ -1,0 +1,119 @@
+RUKUS - Robotic Utility Kit
+END USER LICENCE AGREEMENT (BETA)
+
+Copyright (c) 2026 Samuel Martinez. All rights reserved.
+
+By installing or using RUKUS you agree to these terms. If you do not agree,
+do not install it.
+
+
+1. WHAT YOU MAY DO
+
+   a) Use RUKUS, free of charge, on any number of computers, for any purpose
+      including commercial use in your own facility.
+
+   b) Share the installer with anyone, provided you pass it on COMPLETE and
+      UNCHANGED, exactly as you received it, and at no charge. Point people at
+      the Releases page where you can - it is the only place a build's checksum
+      is published, and an installer with no checksum to check against is one
+      nobody can verify.
+
+
+2. WHAT YOU MAY NOT DO
+
+   a) Modify, adapt, translate or create derivative works of RUKUS.
+
+   b) Reverse engineer, decompile or disassemble it, except to the extent that
+      applicable law expressly permits despite this restriction.
+
+   c) Sell, rent, lease, sublicense or charge for RUKUS, or bundle it into
+      something you charge for.
+
+   d) Rebrand it, or remove or alter any notice, name or attribution in it.
+
+   RUKUS is not open source. No source code is distributed and no rights in the
+   source code are granted.
+
+
+3. THIRD-PARTY COMPONENTS
+
+   RUKUS includes third-party software and fonts, listed in
+   THIRD-PARTY-NOTICES.txt and in the .txt files beside the fonts in
+   Assets\Fonts. Each is used under its own licence.
+
+   NOTHING IN SECTION 2 RESTRICTS YOUR RIGHTS IN THOSE COMPONENTS. Where a
+   component is under an open-source licence, that licence governs it and grants
+   you whatever it grants you. The restrictions above apply to RUKUS itself.
+
+
+4. THIS IS BETA SOFTWARE, AND IT WRITES TO LIVE ROBOT CONTROLLERS
+
+   This is the part that matters more here than in most software.
+
+   RUKUS reads from AND WRITES TO real FANUC controllers - system variables,
+   registers, I/O points, the clock, the speed override, files. Those are real
+   changes to real machines that can move.
+
+   a) You are responsible for every change RUKUS makes on your equipment.
+      Confirmation prompts, pre-flight previews and the write audit log exist to
+      help you, and none of them is a substitute for knowing what a value does
+      before you change it.
+
+   b) This is a beta. It has been exercised against virtual controllers and a
+      real cell, not through a wide release. Expect defects, including defects
+      in features that appear to work.
+
+   c) It is your responsibility to satisfy yourself that RUKUS is suitable
+      before you use it on anything that matters, and to keep your own backups.
+
+   d) Nothing here overrides your own site's safety rules, lockout procedures,
+      or the robot manufacturer's documentation.
+
+
+5. NO WARRANTY
+
+   RUKUS IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+   INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+   PARTICULAR PURPOSE, AND NONINFRINGEMENT. THE ENTIRE RISK AS TO THE QUALITY
+   AND PERFORMANCE OF RUKUS IS WITH YOU.
+
+
+6. LIMITATION OF LIABILITY
+
+   TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, IN NO EVENT SHALL THE
+   AUTHOR BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY - INCLUDING
+   WITHOUT LIMITATION DAMAGE TO EQUIPMENT, LOST PRODUCTION, LOST OR CORRUPTED
+   DATA, PERSONAL INJURY, OR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+   EXEMPLARY OR CONSEQUENTIAL DAMAGES - ARISING FROM OR IN CONNECTION WITH RUKUS
+   OR ITS USE, WHETHER IN CONTRACT, TORT OR OTHERWISE, EVEN IF ADVISED OF THE
+   POSSIBILITY OF SUCH DAMAGE.
+
+   Nothing in this agreement excludes or limits liability where the law does not
+   allow it to be excluded or limited.
+
+
+7. NO OBLIGATION TO SUPPORT
+
+   There is no obligation to provide support, updates or future versions.
+   Issues are welcome on the public issue board, and a beta may be withdrawn or
+   changed at any time.
+
+
+8. TERMINATION
+
+   This licence ends automatically if you breach it. On termination, stop using
+   RUKUS and remove it. Sections 3 to 6 survive.
+
+
+9. TRADEMARKS
+
+   RUKUS is an independent tool and is not endorsed by, affiliated with, or
+   supported by FANUC Corporation. FANUC, ROBOGUIDE, KAREL, SpotTool+ and
+   HandlingTool are trademarks of FANUC Corporation. All other trademarks are
+   the property of their respective owners.
+
+
+---
+
+Questions about these terms, or about a use they do not cover, can be raised on
+the issue board.

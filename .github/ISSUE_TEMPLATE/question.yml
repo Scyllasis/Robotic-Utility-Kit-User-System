@@ -1,0 +1,31 @@
+name: Question
+description: How do I…? Is this supposed to…?
+title: "[Question] "
+labels: ["question"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Ask away. If the answer turns out to be missing from the
+        [User Guide](../blob/main/USER-GUIDE.md), that is a docs bug and worth knowing.
+
+  - type: textarea
+    id: question
+    attributes:
+      label: What do you want to know?
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: RUKUS version
+      description: "**Help > About**. Only if the answer might depend on it."
+      placeholder: 0.9.0-beta.1
+
+  - type: checkboxes
+    id: looked
+    attributes:
+      label: Before asking
+      options:
+        - label: I had a look in the User Guide
