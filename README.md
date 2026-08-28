@@ -3,13 +3,17 @@
 **Back up, monitor, compare and edit FANUC robot controllers across a whole cell, from one
 Windows PC.**
 
-> ### 🚧 Coming soon — beta
+> ### 🧪 Public beta
 >
-> The first public beta has not been released yet. This repository is being set up ahead of
-> it: the guides are here, the [issue board](../../issues) is open, and the download will
-> appear under [Releases](../../releases) when it is ready.
+> RUKUS is in **beta**. Get the installer from [Releases](../../releases), and read
+> [INSTALL.md](INSTALL.md) first — particularly the checksum step and the SmartScreen
+> warning, both of which you will hit, because beta builds are not code-signed.
 >
-> **[Watch this repository](../../subscription)** to be told when it lands.
+> It talks to machines that move. [Known limitations](../../releases) are listed in full on
+> each release, and they are the honest gaps rather than a formality.
+>
+> Found something wrong? The [issue board](../../issues) has templates for bugs, ideas and
+> questions. **[Watch this repository](../../subscription)** to hear about new builds.
 
 ---
 
