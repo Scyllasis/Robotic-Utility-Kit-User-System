@@ -25,7 +25,7 @@ installer, so you should. Every release publishes the installer's SHA-256 in its
 Open PowerShell where you downloaded it and run:
 
 ```powershell
-Get-FileHash .\RUKUS-Setup-0.9.0-beta.3.exe -Algorithm SHA256
+Get-FileHash .\RUKUS-Setup-0.9.0-beta.4.exe -Algorithm SHA256
 ```
 
 Compare the `Hash` it prints against the one in the release notes. They are case-insensitive.
