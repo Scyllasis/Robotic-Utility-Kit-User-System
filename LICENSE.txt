@@ -1,7 +1,7 @@
 RUKUS - Robotic Utility Kit
 END USER LICENCE AGREEMENT (BETA)
 
-Copyright (c) 2026 Samuel Martinez. All rights reserved.
+Copyright (c) 2026 RUKUS Team. All rights reserved.
 
 By installing or using RUKUS you agree to these terms. If you do not agree,
 do not install it.
