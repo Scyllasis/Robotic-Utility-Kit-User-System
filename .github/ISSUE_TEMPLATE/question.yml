@@ -21,7 +21,7 @@ body:
     attributes:
       label: RUKUS version
       description: "**Help > About**. Only if the answer might depend on it."
-      placeholder: 0.9.0-beta.2
+      placeholder: 0.9.0-beta.1
 
   - type: checkboxes
     id: looked
