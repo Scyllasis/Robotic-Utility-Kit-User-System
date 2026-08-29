@@ -51,7 +51,7 @@ body:
     attributes:
       label: RUKUS version
       description: "**Help > About** shows it. Please give the exact string, including any -beta suffix."
-      placeholder: 0.9.0-beta.2
+      placeholder: 0.9.0-beta.1
     validations:
       required: true
 
