@@ -2006,10 +2006,17 @@ inside it — the container, the p-code, the symbol table, and decompiled KAREL 
 
 ### How far to trust it
 
-The decompiler is verified against a 250-program corpus, and the real test is not "does it look
-right" but "does it compile back": fed to FANUC's own `ktrans`, the output recompiles **145 of 250**
+The decompiler is verified against a 491-program corpus, and the real test is not "does it look
+right" but "does it compile back": fed to FANUC's own `ktrans`, the output recompiles **446 of 491**
 corpus programs to a byte-identical `.PC`. The rest decompile to readable source that is not yet
 byte-exact.
+
+> A handful of programs cannot round-trip no matter how good the decompiler gets. A `.PC` can
+> carry a task attribute that is applied when the program is **loaded onto a controller**, not
+> when it is translated — there is no source text that produces it, so a rebuild differs from the
+> original by those bytes while being otherwise correct. If a program rebuilds to exactly the
+> right size and differs in one or two bytes, this is the likely reason and not a fault in the
+> source you were given.
 
 > Treat the source as something to *read*, not as a drop-in replacement for a `.KL` you have lost —
 > unless you have recompiled it and compared the result yourself.
