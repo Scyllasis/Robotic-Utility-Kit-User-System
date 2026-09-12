@@ -4,7 +4,7 @@ Windows 10 (1809 or later) or Windows 11, 64-bit. Nothing else to download first
 installer carries the .NET runtime and the Windows App Runtime and puts both in place for
 you.
 
-The download is **195 MB**. A first install uses about **478 MB** of disk: 312 MB for RUKUS,
+The download is **196 MB**. A first install uses about **478 MB** of disk: 312 MB for RUKUS,
 and 166 MB for the Windows App Runtime — a Microsoft component installed once and shared
 with any other app that uses it, and skipped entirely if the machine already has it.
 
@@ -28,7 +28,9 @@ Open PowerShell where you downloaded it and run:
 Get-FileHash .\RUKUS-Setup-*.exe -Algorithm SHA256
 ```
 
-Compare the `Hash` it prints against the one in the release notes. They are case-insensitive.
+Compare the `Hash` it prints against the one in the release notes, or against the
+`RUKUS-Setup-<version>.exe.sha256` file published beside the installer. They are
+case-insensitive.
 
 | Result | What it means |
 |---|---|
@@ -60,14 +62,18 @@ Code signing is on the list for the first non-beta release, which will remove th
 
 ## 4. Run the installer
 
-Standard Windows installer. It will ask for administrator rights, because it writes to
-Program Files, installs the Windows App Runtime, and creates the Start Menu entry.
+Standard Windows installer, and it does **not** need administrator rights: RUKUS installs
+for your user account, under `%LocalAppData%\Programs\RUKUS`. If you are an administrator
+and would rather install it for everyone on the PC, the first page offers that.
 
 | Prompt | Notes |
 |---|---|
+| **Licence** | Read, accept. |
+| **Beta notice** | Read it, then tick the box at the bottom - Next stays put until you do. |
+| **Your data was found** | Only on an upgrade. It is telling you `Documents\RUKUS` is kept. |
 | **Install location** | Default is fine. |
-| **Desktop shortcut** | Optional. |
-| **Start Menu folder** | Default is fine. |
+| **Desktop shortcut / start with Windows** | Both optional. |
+| **Before you open it** | One page of first-launch notes after the files are in. |
 
 ### It will pause on "Installing the Windows App Runtime"
 
@@ -156,9 +162,31 @@ that folder by hand if you want it gone.
 | **No notifications ever appear** | See step 5. It is almost always Focus Assist or Windows' per-app notification settings, neither of which RUKUS can see. |
 | **Cannot reach any robot** | Almost always the network adapter, not RUKUS. Check the **Adapter** dropdown on the main screen is the NIC on the robot subnet. |
 
+---
+
+## Installing silently (IT)
+
+The setup exe takes Inno Setup's standard switches:
+
+```
+RUKUS-Setup-<version>.exe /SILENT
+RUKUS-Setup-<version>.exe /VERYSILENT /NORESTART /DIR="C:\Apps\RUKUS" /TASKS="desktopicon"
+RUKUS-Setup-<version>.exe /VERYSILENT /LOG="C:\Logs\rukus-install.log"
+```
+
+`/SILENT` shows progress only; `/VERYSILENT` shows nothing. `/TASKS=` takes
+`desktopicon` and `startupicon`, comma-separated. A silent install skips the licence,
+beta notice and first-launch pages, so whoever runs it this way is taking on what those
+pages say. The Windows App Runtime step still runs, and still takes a minute on a machine
+that does not have it.
+
+Uninstall silently with `unins000.exe /VERYSILENT` from the install folder.
+
+---
+
 ### If you need to report it
 
-**System → Collect Diagnostics…** builds a zip with the logs, your settings and the crash log
+**System → Report a problem…** asks what happened and sends it with the diagnostics bundle (logs, settings, crash log, a redacted cluster summary); **System → Collect Diagnostics…** builds the same zip on its own
 in it, and offers to show you the file. Attach that to your issue — it is the difference
 between a report somebody can act on and one that needs three rounds of questions.
 

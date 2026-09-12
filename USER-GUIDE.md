@@ -20,6 +20,12 @@ Operations and the KCL Console had all moved to **Tools**, and the Error Code Lo
 
 A step-by-step guide to using RUKUS for managing your FANUC robot controllers.
 
+> **The beta notice.** The first time each version of RUKUS starts, it shows a short notice:
+> it is unverified on controllers other than the one it was built against, changes to a
+> controller are your responsibility (and [writes are off by default](#controller-writes)),
+> and bugs will exist - see [Reporting Problems](#reporting-problems). "I understand" dismisses
+> it until the next version.
+
 > The app also has a built-in guide: **System → User Guide**, kept in sync with the
 > current screens.
 >
@@ -127,7 +133,7 @@ before opening one.
 
 | Menu | What's in it |
 |---|---|
-| **System** | The app itself: Open Settings, Collect Diagnostics, Open Logs Folder, User Guide, **Error Code Lookup**, About, Exit. |
+| **System** | The app itself: Open Settings, Report a problem, Collect Diagnostics, Open Logs Folder, User Guide, **Error Code Lookup**, About, Exit. |
 | **Cluster** | The cell's *record*: new/rename/delete a cluster, cluster properties, view raw data, import/export. Nothing here touches a robot. |
 | **Tools** | Things you **run** against the cell: Smart Scan, Bulk Operations, Alarm Collectors, Backup Scheduler, KCL Console, Remove RUKUS Files. |
 | **Monitor** | What the cell is doing right now: Production Dashboard, I/O and Data Watcher, Error Watcher, Signal Scope. |
@@ -175,6 +181,15 @@ A **cluster** is a logical group of robots — typically robots in the same phys
 - Right-click a cluster → **Add Robot**.
 - Or use Smart Scan to discover and add robots automatically.
 
+### Untested controller software
+
+RUKUS was built and verified against controllers running FANUC software **V9.x and below**.
+When an identity read (Re-get Identity, Auto-Detect Details) finds a newer version, the robot's
+card shows an **Untested V10** chip, the identity dialog says so, and a warning goes to the log.
+The app still works, but its page parsers and controller writes may behave differently there:
+if anything looks wrong, use [Reporting Problems](#reporting-problems) so the RUKUS team can look
+into it.
+
 ### Removing Robots
 
 - Right-click a robot → **Remove Robot**.
@@ -213,6 +228,16 @@ Smart Scan discovers FANUC controllers on your network by probing for FTP-capabl
 - **IP Address:** The controller's network address.
 - **Model:** Best-effort detection (still in development).
 
+### Locking a production robot
+
+**Edit Robot → Lock against writes (production robot).** A locked robot refuses every write
+from RUKUS - values, I/O, system variables, the clock, program loads and bounces, RUKUS-file
+removal, and every KCL Console command other than `SHOW` - **whoever is signed in and whatever
+the Enable-writes switch says**. Reads, watching and backups are unaffected. The card shows a
+red **Write lock** chip, every refusal names the robot and is written to the Write Audit Log, and
+Load / Remove RUKUS Files on a mixed selection offer to skip the locked ones and carry on with
+the rest. Roles decide *who* may write; the lock decides *which* robot may be written to. Use it
+on the cell you must not touch by accident.
 ### Adding Discovered Robots
 
 1. Select one or more robots from the scan results.
@@ -247,11 +272,27 @@ The backup window shows per-robot status:
 - **Done** — Backup complete.
 - **Failed** — An error occurred (check the status message).
 
+### Where backups go
+
+Each cluster gets a folder under your backups folder (Settings > Folders). Inside it:
+
+- **Latest** holds each robot's newest backup, one folder per robot. It is always a complete
+  backup: a run downloads to a staging folder first and only replaces Latest once it finished.
+- **One folder per robot** (named after the robot) holds that robot's older backups, one per run,
+  named by the batch name from Settings > Backup naming template.
+- Every backup folder carries a small `rukus-backup.json` saying which robot, when, which files
+  and which RUKUS wrote it.
+
+Backups made by earlier versions stay where they are and are still found by Restore, Program
+History and Verify.
+
 ### Zip After Backup
 
-Optionally compress the backup folder after download:
-- Check **Zip after backup** in the backup dialog.
-- The zip file is created next to the backup folder, and the unzipped folder is deleted.
+Optionally compress older backups to save space:
+- Check **Zip after backup** in the backup dialog (or on the schedule).
+- When a new backup lands, the previous one is zipped as it moves under the robot's folder.
+  Latest itself is never zipped, so Verify and Restore always have loose files to work with;
+  Restore and Program History read the zipped older backups directly.
 
 ### Backup Filters
 
@@ -267,6 +308,12 @@ When using Filtered Backup, select which file types to include:
 
 Backups are saved to `Documents\RUKUS\Backups\` by default. You can change this in **System → Open Settings… → Folders**.
 
+**Clusters folder.** The same page has a *Clusters folder* row. Point every PC on the cell at one
+shared folder and they all open, and save, the same clusters. RUKUS stamps who saved a cluster
+last; when a save would overwrite somebody else's newer save, the log says so and the previous
+file is kept in the folder's `Backups` subfolder. Nothing is copied when the setting changes -
+export a cluster and import it there. If the share cannot be reached, RUKUS works from its local
+`Documents\RUKUS\Clusters` and says so in the log.
 ---
 
 ## Bulk Operations
@@ -814,6 +861,10 @@ so*; narrow the search to see the rest.
 
 ## Signal Scope
 
+> **Preview.** The menu item and the window title say **(Preview)**: the scope has been run
+> against one robot's pages and is still collecting feedback. Please report anything odd through
+> [Reporting Problems](#reporting-problems).
+
 A virtual oscilloscope for robot signals. Several signals share **one scrubbable timeline**, so you
 can see not just what each one did but **what happened in what order** — which is the question a
 list of current values can never answer.
@@ -822,7 +873,7 @@ Digital signals draw as **step traces**; registers and analog points draw as **l
 
 ### Opening it
 
-- **Monitor → Signal Scope** (or **Ctrl+K**, "scope").
+- **Monitor → Signal Scope (Preview)** (or **Ctrl+K**, "scope").
 
 ### Adding signals
 
@@ -907,29 +958,50 @@ Get a quick snapshot of a robot's configuration and status.
 
 ## File Control
 
-Transfer files between your PC and the robot controller.
+Transfer files between your PC and the robot controller. The window is two panes
+(WinSCP-style): your folder's files on the left, the selected robot's FTP directory on the
+right, and the transfer arrows between them.
 
 ### Opening File Control
 
-- Select a robot → **Files → File Transfer (FTP)**.
+- **Files → File Transfer (FTP)**. Pick the cluster and robot in the window's top bar.
 
-### Browsing Remote Files
+### The window
 
-The remote file list shows files on the controller's FTP server:
-- Navigate directories using the folder tree.
-- File size and date are displayed.
+- The **top bar** scopes the remote side (cluster, robot, adapter); **List Robot Files**
+  (or **F5**) fetches the robot's directory.
+- Both panes carry a **search box**, a **type filter** ("Loadable" on the local side shows
+  just the media a robot can load), and a **sort** dropdown — Name / Type / Size / Date,
+  with a direction toggle. Files the controller did not report a size or date for sort
+  last, whatever the direction.
+- The local pane's header shows the folder path truncated to its last three segments
+  ("C:\\…\\repos\\RUKUS") — hover it for the full path. **Up** and **Browse** navigate; the
+  refresh icon-button re-reads the folder when it changed outside RUKUS.
+- The **View** menu: **Always on top** (session pin), **Panes** (Auto stacks the panes when
+  the window is too narrow for two side by side; the other two force a shape), **Open local
+  folder in File Explorer**. The window can be narrowed to 500px — at that width the panes
+  are always stacked, one above the other, and the pre-flight card scrolls sideways rather
+  than hiding its disposition chips.
+- Keyboard: **F5** lists the robot's files; **Alt+→** loads, **Alt+←** downloads, **Alt+↑**
+  bounces — the same arrows the buttons carry.
+- The **Settings** menu opens the Settings window straight on the pages these transfers
+  read: **Connection settings…** (FTP upload timeout, bounce settle, robots at once) and
+  **Choose text editor…**.
 
-### Upload Files
+### Upload Files (Load)
 
-1. Click **Load** (upload).
-2. Select local files to send to the controller.
-3. Files are uploaded to the current remote directory.
+1. Select local files (left pane).
+2. Click **Load**. Only robot-loadable types (.TP, .LS, .VR, …) are sent; anything else is
+   skipped with a row saying so.
+3. Tick **All robots in cluster** (under Load) to push the same files to every robot in the
+   cluster — the confirm names every robot whose files it will replace. One robot failing
+   does not stop the rest, and **Stop** cancels the remaining robots.
 
 ### Download Files
 
-1. Select files in the remote file list.
-2. Click **Download**.
-3. A pre-flight lists exactly what will be written and what it will overwrite. Untick anything you
+1. Select files in either pane — or both; the union is downloaded.
+2. Click **Download**. A pre-flight lists exactly what will be written and what it would
+   overwrite, with **Select all / Select none** links for the big plans. Untick anything you
    want to keep, then confirm.
 
 > **Faster since 2026-08-25.** The pre-flight used to open a second FTP session and re-list every
@@ -940,12 +1012,19 @@ The remote file list shows files on the controller's FTP server:
 
 ### Bounce (Round-Trip Test)
 
-The **Bounce** feature tests file integrity by:
-1. Uploading a local file to the controller.
-2. Downloading it back over the same local file.
-3. Comparing the result.
+**Bounce** uploads the selected local files, then downloads the controller's stored copies
+back over the local ones — the round trip shows what the controller actually kept. Bounce
+also goes through a pre-flight, because it replaces **both** sides: the upload overwrites
+the robot's copy, the read-back overwrites the local one, and the plan shows each file's
+both sides before either is touched. What comes back is the controller's rendition of what
+you sent — a .TP or .LS is ingested and re-stored — so a difference from what you sent is
+the finding the feature exists to show.
 
-This verifies that the file transfer path is working correctly.
+### Drag & drop
+
+Drop files on the **local pane** to copy them into the working folder — a pre-flight opens
+only when something already there would be replaced. Drop robot-loadable files on the
+**robot pane** to upload them to the selected robot.
 
 ---
 
@@ -1006,6 +1085,7 @@ Save and run frequently-used KCL commands as shortcuts.
 ### Opening Quick Commands
 
 - Open **Tools → KCL Console** — the quick commands live inside the KCL Console (there is no separate menu item).
+- Commands RUKUS classes as **dangerous** (memory wipes, mastering, DCS) are **blocked** unless the signed-in role allows them - see [Users](#users) under Settings. The console says so, and the attempt is recorded.
 
 ### Using Quick Commands
 
@@ -1124,8 +1204,9 @@ save and again when it starts, so changes made in Task Scheduler are overwritten
 
 - **Run while the PC is switched off.** Nothing wakes a powered-down machine. A missed run
   starts automatically the next time the machine is available.
-- **Run while nobody is signed in.** Tasks run as the user who created them, with no stored
-  password - that is the trade for never having to ask for one.
+- **Run while nobody is signed in.** Scheduled backups run as you whenever you are signed in -
+  a locked screen is fine. On a PC nobody is signed in to, nothing runs. Tasks run with no
+  stored password - that is the trade for never having to ask for one.
 - **Run on battery.** A backup interrupted by a flat battery leaves a folder that looks
   complete and is not.
 
@@ -1144,7 +1225,10 @@ workaround until the registration problem is sorted out.
 
 ### Scheduler log
 
-View the activity log at `Documents\RUKUS\SchedulerLog.txt`.
+View the activity log at `Documents\RUKUS\SchedulerLog.txt` - or click **Open activity log**
+at the bottom of the Scheduled Tasks window. When the file grows past about half a megabyte
+it is renamed `SchedulerLog.1.txt` and a fresh one is started, so the previous stretch is
+still there to read.
 
 The log shows:
 - Which cluster was worked on, and what was done
@@ -1160,6 +1244,14 @@ did not happen.
 
 ## Write Audit Log
 
+**Filters.** Robot, outcome, **user** (the RUKUS account that made the write) and **period** -
+the last hour, the two shift lengths, today, a week or a month. The search box reaches the
+address, label, values, user, role and reason. **Export...** writes whatever the filters show,
+so a shift's writes are one pick and one click.
+> **Why, in your words.** The per-write confirmation dialog has an optional **Reason** box.
+> Whatever you type there is stored on the audit line and shown in the log as *Reason: ...*, so
+> the record says not only what changed but why. It is optional on purpose; leave it blank for
+> routine changes and fill it for the ones somebody will ask about.
 Every value RUKUS writes to a controller is recorded, whether it succeeded or not. Open
 it from **Data → Write Audit Log**.
 
@@ -1231,6 +1323,138 @@ backups go", "overwrite") and it jumps to the setting and highlights it.
 > adapter rather than any controller. Lower it if a large cell backs up unreliably;
 > raising it past a point buys nothing, because the controller is usually the slow part.
 
+### Safety (Controller Writes)
+ page for the three gates and the door to the fourth: the write switch, the confirmation, the idle sign-out, and **Manage users and roles...**, which opens the Users page.
+
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| Enable writes to controllers | **Off** | The beta write gate. While off, RUKUS refuses every value, comment, I/O, system-variable and clock write and records the attempt in the Write Audit Log. Reading, watching and backing up are unaffected. Switching it on asks you to acknowledge, in words, what that means; "Keep off" puts the switch back. |
+| Confirm before writing | Dangerous only | Which writes ask first once writes are enabled: system variables and position registers by default, everything, or nothing |
+| Keep write audit history for | 0 (forever) | Days of audit history to keep |
+
+> **"Why can't I write?"** Under these controls a grey box says, for the person signed in right
+> now, where all three gates stand - the switch on this PC, whether the role may write, and the
+> confirmation policy - and ends with the verdict. When a write is refused, this is the first
+> place to look.
+> **Writes are off by default in this beta.** RUKUS's writes were verified against one robot
+> model, and other controllers, versions and options may behave differently. Turn the switch on
+> only for a controller you are responsible for, and check what changed on the pendant. Bulk
+> Operations always confirms its runs whatever the picker says. Two things are **not** covered
+> by the switch: the **KCL Console**, which sends what you type, and program uploads from
+> **File Control** or the **Position Plotter**, which are file transfers rather than value writes
+> and keep their own confirmations. Both still need the signed-in **role** to allow them - the
+> switch is about *what* may be sent, the role about *who* may send it.
+
+> The **Enable writes** switch can only be flipped by a user whose role can manage users - an
+> administrator, in the default set-up. Everyone else sees it disabled with a note saying who to
+> ask.
+
+### Users
+
+RUKUS has its own local users, and each one holds a **role** that decides what the app will do
+for them. This page is where users and roles are managed - the "admin panel" the refusal
+messages point at.
+
+**Out of the box there is one user, `admin`, with no password**, holding the Administrator role.
+RUKUS signs `admin` in silently at startup, so a fresh install never shows a sign-in prompt. The
+prompt appears as soon as you give the auto-login account a password or turn on **Require
+sign-in at startup**. Who is signed in is always shown in the title bar next to the version
+("admin · Administrator"), and **System → Switch User...** or **Sign Out** changes it. There is no
+way to dismiss the sign-in prompt and carry on signed out - a signed-out RUKUS holds no permissions
+at all - so its only other button is **Exit RUKUS**.
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| Require sign-in at startup | Off | On: every launch asks who is there, even if the only account has no password. Off: RUKUS signs in as the auto-login account without asking, unless it has a password. |
+| Sign out after minutes without input | 0 (never) | Minutes without keyboard or mouse input **at the PC, in any program** before RUKUS signs the current user out and shows the sign-in dialog. Only useful once accounts have passwords or sign-in is required - a password-less admin is simply signed back in on Enter. |
+| Users | `admin` | The accounts that can sign in - a user name, an optional display name, a role, and whether a password is set. **Add user...**, **Edit...**, **Set password...** and **Remove**. Leaving both password boxes blank removes the password. RUKUS refuses to remove the last user who can manage users, so you cannot lock yourself out. |
+| Roles | Administrator, Operator, Viewer | A named set of permissions. The three built-in roles can be edited but not removed; **Add role...** makes a custom one. A role still held by a user cannot be removed. |
+
+A role can hold any combination of five permissions:
+
+- **Write to controllers** - value, comment, I/O, system-variable and clock writes, and anything
+  else that puts something on a controller: program loads and bounces from File Control, dropping
+  files onto a robot card, saving an edited file back, and removing RUKUS's own files from a
+  robot. Without it every one of those is refused (and recorded in the Write Audit Log), whatever
+  the Enable-writes switch says.
+- **Use the KCL Console** - open the console and send from it at all.
+- **Send dangerous KCL commands** - the commands RUKUS classes as dangerous (memory wipes,
+  mastering, DCS). **Off by default for every role, administrators included**; tick it
+  deliberately, for the one role that needs it.
+- **Manage users and roles** - this page, the Enable-writes switch and the idle sign-out time.
+- **Edit the cluster record** - add, edit and delete robots and clusters, import a cluster, and
+  change the backup schedules and alarm collectors. Nothing here reaches a robot, but it is the
+  cell's description in RUKUS, and a read-only role should not be able to delete it. Administrator
+  and Operator have it out of the box; a store from an earlier beta grants it to every role that
+  could already write to controllers.
+
+**What a role does not limit.** Settings (folders, naming, transfers, appearance), backups,, watching, the editors' browse lists and every read are open to every signed-in user, included. A role limits what can be *changed* on a robot or in the cell's record, not what be looked at. Every refusal names the user, the role and where to ask, and is written to the Audit Log - which, since this beta, also records the RUKUS account and role on every line, only the shared Windows login.
+
+Changes on this page are saved the moment you make them - there is nothing to Save - to
+`Documents\RUKUS\Users.json`, whose path is shown at the bottom of the page. Passwords are stored
+as salted hashes, never in clear. These are local accounts for a cell PC, not a company login:
+they exist so that the person who can wipe a controller's memory is the person meant to.
+
+### Keeping backups in check
+
+- **Settings → Folders → Keep the last N older backups per robot** and **Cap each robot's older
+  backups at N MB.** 0, the default, is no limit of that kind. Otherwise, after a robot backs up
+  and its previous backup moves under the robot's folder, the oldest ones there are deleted until
+  both limits hold, and each deletion is logged. Latest is never deleted, and a run that failed or
+  was cancelled deletes nothing. The line under the boxes says what the backups folder holds.
+- **Analyse → Verify Latest Backup...** fetches the files of each ticked robot's most recent
+  backup from the robot again and compares them byte for byte. "OK" means the backup is readable
+  *and* still matches the controller; anything else lists the files that differ or are gone. A few
+system files (sysvars.sv, sysmast.sv, dcspos.sv) change on the controller between one fetch and
+the next, so a difference in those alone means the backup is fine and the robot is alive. It
+  reads only; nothing is restored.
+- **Every scheduled backup is verified the same way** the moment it finishes, unless
+  **Settings → Folders → Verify each scheduled backup** is off. A difference is toasted at the
+  time, listed under the title bar's notification icon at the next start with the files named,
+  and written to
+  `SchedulerLog.txt` and `Documents\RUKUS\Logs\verify-*.txt`.
+- **While you were away.** When RUKUS starts more than four hours after it last did, a notice
+  sums up what happened in between: writes made, refused or failed and by whom, and each
+  scheduled run with its verify. Close it and it is gone; the audit log and the scheduler have
+  the detail.
+- **A scheduled backup that failed while nobody was signed in** is announced in a red bar under
+  the menu at the next start, with the cluster, the time and the number of attempts, and buttons
+  for the logs folder and the scheduler. Closing the bar clears it until the next failure.
+- **Bulk Operations → Preview** is the dry run: it reads every robot's current value first and
+  shows what would change, without sending anything.
+**First launch.** A fresh install meets two things: the sign-in (which signs the password-less
+admin in silently) and the tour, whose first page is the beta notice with **I understand** as
+its Next. Later versions show the notice on its own once, then What's New once.
+### Restore, program history and notes
+
+- **Right-click a robot → Robot Files → Restore from Backup...** picks one of that robot's
+  backups, then the files to put back, then asks once more with a Reason box. Restore goes
+  through every gate a write does - your role, the robot's Write lock, and the Enable-writes
+  switch, which it needs ON - and writes one audit line per file. Programs that are selected or
+  running on the pendant cannot be overwritten; reload restored programs on the pendant before
+  running them. Older backups that were zipped are read directly.
+- **Analyse → Program History...** reads every backup of the ticked robot and, for each .TP and
+  .LS, counts versions by content, says when it last changed and in which backup, and notes any
+  program missing from the latest backup. Reads the archive only.
+- **Edit Robot → Notes.** Who owns it, what is odd about it, who to call. The text sits on the
+  card's tooltip and a small **Note** chip says it is there.
+- **System → Collect Diagnostics...** now includes the Write Audit Log and the last verify
+  reports, so a report about a write or a backup carries its own evidence.
+### Locking, What's New and the tour
+
+**System → Lock RUKUS** (Ctrl+L) keeps every window open but holds no permissions until the
+same user types their password again; **Switch user...** on the lock dialog is the way out for
+somebody else. An account without a password cannot be locked, so it goes to the sign-in
+dialog instead. **System → What's New...** shows the notes for the running version - they also
+appear once, by themselves, the first time a new version starts. **System → Take the Tour...**
+is the three-screen introduction a first run gets: the cluster, backups, and writes and safety.
+**The notification icon.** A bell (or a caution sign, once anything needs attention) appears in
+the title bar beside your name whenever RUKUS has something to say that can wait: the Ctrl+K tip
+on the first few launches, what happened while you were away, a backup that did not verify, an
+update. Click it for the list; each entry has its buttons and a Dismiss. Only two things still
+interrupt with a bar under the menu: a success that clears itself in a few seconds, and a
+scheduled backup that backed up nothing.
 ### Data Locations
 
 | Setting | Default | Description |
@@ -1316,7 +1540,10 @@ the robot, the source and the time. If you filtered the list, you export the fil
 
 ## Reporting Problems
 
-If something misbehaves, use **System → Collect Diagnostics...**.
+If something misbehaves, use **System → Report a problem...**: a one-line title, what happened,
+what you expected, and one button. The report goes in with the diagnostics bundle attached -
+sent straight in, by email, or through the project bug page, whichever this build is set up
+for. **System → Collect Diagnostics...** still builds the bundle on its own when someone asks for one.
 
 ### What's Included
 
@@ -1339,8 +1566,21 @@ The diagnostic bundle saves a `RUKUS-Diagnostics-<date>.zip` to your Desktop con
 
 1. Enable **System → Open Settings… → Diagnostics → Verbose logging**.
 2. Reproduce the problem.
-3. Collect diagnostics via **System → Collect Diagnostics...**.
-4. Attach the zip file to your bug report.
+3. Use **System → Report a problem...** and describe what you saw.
+4. If the dialog opened your mail client or the bug page, attach the zip from your Desktop.
+
+### When a list looks wrong or empty
+
+Every page parser in RUKUS was proven against one robot's captures, so on a different
+controller model or software version a page may come back in a shape the parser does not
+expect - and the window shows nothing, or the wrong thing, without an error. The **Data
+Editor**, **I/O Editor**, **Error Log** and **System Variables** windows each have a
+**Save raw capture** button beside **Export**. It saves the raw page text exactly as the
+parser saw it on the most recent load (NUMREG/POSREG/STRREG.VA, IOSTATE.DG, ERRALL.LS or
+SYSTEM.VA), with the robot, page and time in a two-line header. Attach that `.txt` to the
+bug report along with the diagnostics zip; it is what lets the parser be fixed for your
+controller. Only the most recent capture of each page is kept, so load the page first,
+then save.
 
 ---
 
@@ -1365,11 +1605,15 @@ RUKUS stores all data under `Documents\RUKUS\`:
 
 ## Position Plotter
 
+> **Preview.** The menu item and the window title say **(Preview)**: the plotter is the newest
+> and largest surface in the app and has had few users. Please report anything odd through
+> [Reporting Problems](#reporting-problems).
+
 A 3D scatter visualization tool for FANUC teach points. Loads P[n] positions from `.LS` files via FTP or local upload, renders them as an interactive 3D point cloud with path lines, direction arrows, and measurement tools.
 
 ### Opening the Position Plotter
 
-**Analyse → Point Plot** from the main menu bar.
+**Analyse → Point Plot (Preview)** from the main menu bar.
 
 The window opens maximized (CAD-style fullscreen) with a 3-column layout:
 

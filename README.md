@@ -27,7 +27,8 @@ It is built for the jobs that are tedious one robot at a time:
 
 | | |
 |---|---|
-| **Back up a whole cluster** | On a schedule, or on demand. Filters by file type, zips if you want. |
+| **Back up a whole cluster** | On a schedule, or on demand. Each robot's newest backup stays in `Latest`, older ones under the robot's own folder, with a keep-count and a size cap. Every scheduled backup is checked against the robot afterwards. |
+| **Write only when you say so** | Writes are off until you switch them on. Every write is confirmed and audited, and local users and roles decide who may. |
 | **Find the odd one out** | Compare two robots, or check a cluster for drift against a reference. |
 | **Answer "where is this used?"** | Search every program in a backup for a register, an I/O point or a position. |
 | **Write to many at once** | Set the clock, set the speed override, set a register — across a cluster, with a pre-flight that shows you what would change before it changes. |
@@ -41,7 +42,7 @@ There is a full [User Guide](USER-GUIDE.md).
 
 - **Windows 10 (1809 or later) or Windows 11**, 64-bit
 - Network access to your controllers (FTP, and HTTP for the live features)
-- A **195 MB** download
+- A **196 MB** download
 
 Disk, first install:
 
