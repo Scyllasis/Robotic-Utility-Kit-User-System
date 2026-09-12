@@ -17,7 +17,7 @@ Windows PC.**
 
 ---
 
-## What it is?
+## What is it?
 
 RUKUS talks to FANUC controllers over FTP, KCL and HTTP and gives one operator a view of a
 whole cell instead of one robot at a time. It is a plain Windows desktop app — no server, no
