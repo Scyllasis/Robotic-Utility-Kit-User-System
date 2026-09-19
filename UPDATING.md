@@ -80,22 +80,18 @@ on a production machine and do this instead:
 
 ## Version numbers
 
-RUKUS versions are dates: **year.month.build** — two-digit year, the month, and which build
-of that month it is.
+RUKUS uses SemVer-style versions, and during the beta they carry a pre-release suffix:
 
 ```
-0.9.0-beta.3   →   26.9.1   →   26.9.2   →   26.10.1   →   27.1.1
+0.9.0-beta.1   →   0.9.0-beta.2   →   0.9.0-rc.1   →   0.9.0
 ```
 
-`26.9.1` is the first build of September 2026 and `26.10.1` the first of October. The three
-numbers compare as numbers, so a new month is always newer than the last build of the old one,
-and every dated build is newer than the `0.9.0-beta.n` builds that came before it. (A naive
-string comparison would get `26.10.1` vs `26.9.2` backwards, which is why the ordering is tested
-rather than assumed.)
+A pre-release sorts **before** the release it leads to, so a tester on `0.9.0-beta.3` is
+correctly offered the final `0.9.0` when it lands. (This is the ordering a naive string
+comparison gets exactly backwards, which is why it is tested rather than assumed.)
 
-RUKUS is still a beta; the date says when a build was made, not that it has left beta. If you
-want RUKUS to stay on a version you have qualified, set updates to **Off** or **Notify me** —
-those are what they are for.
+**During the beta, every release is a pre-release.** If you want RUKUS to stay on a version
+you have qualified, set updates to **Off** or **Notify me** — those are what they are for.
 
 ---
 
