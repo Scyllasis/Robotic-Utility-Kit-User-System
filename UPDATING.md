@@ -80,18 +80,43 @@ on a production machine and do this instead:
 
 ## Version numbers
 
-RUKUS uses SemVer-style versions, and during the beta they carry a pre-release suffix:
+A RUKUS version tells you what the build is. Three numbers:
 
 ```
-0.9.0-beta.1   →   0.9.0-beta.2   →   0.9.0-rc.1   →   0.9.0
+26 . 91 . 13026
+ │    │    └──────── the day the work started, then the issue number:  13 and #026
+ │    └───────────── the month the work started, then the kind of change:  September, 1
+ └────────────────── the year:  2026
+
+                     the kind of change:  1 feature · 2 bug fix · 3 maintenance · 4 docs · 9 a release
 ```
 
-A pre-release sorts **before** the release it leads to, so a tester on `0.9.0-beta.3` is
-correctly offered the final `0.9.0` when it lands. (This is the ordering a naive string
-comparison gets exactly backwards, which is why it is tested rather than assumed.)
+So `26.91.13026` is a **feature**, for **issue #26**, that was started on **13 September 2026**.
+To read the second number, split off the last digit: `91` is September, feature; `101` is
+October, feature. To read the third, split off the last three digits: `13026` is day 13, issue
+26; `5004` is day 5, issue 4.
 
-**During the beta, every release is a pre-release.** If you want RUKUS to stay on a version
-you have qualified, set updates to **Off** or **Notify me** — those are what they are for.
+A **release** has 9 as its kind and just a release number: `26.99.1` is September 2026's first
+release, `26.99.2` the second. A release is always a higher number than the working builds of its
+month, so an update to it is always offered.
+
+```
+0.9.0-beta.3   →   26.9.13026.1   →   26.91.13026   →   26.92.19005   →   26.99.1   →   26.101.2031   →   27.13.5040
+```
+
+(`26.9.13026.1`, with the kind as a fourth number, was the form used for three days in September
+2026.)
+
+The numbers compare as numbers, left to right, so a new month is always newer than anything
+from the month before, and every one of them is newer than the `0.9.0-beta.n` builds that came
+first. RUKUS only ever offers you a version higher than the one you have, and a release is
+checked against everything already published before it goes out. (A naive string comparison
+would get `26.10.2031.1` vs `26.9.19005.2` backwards, which is why the ordering is tested
+rather than assumed.)
+
+RUKUS is still a beta; the number says what a build is and when the work began, not that it has left beta. If you
+want RUKUS to stay on a version you have qualified, set updates to **Off** or **Notify me** —
+those are what they are for.
 
 ---
 

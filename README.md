@@ -116,3 +116,10 @@ is not open source; the code lives in a private repository.
 RUKUS is an independent tool. **FANUC**, **ROBOGUIDE**, **KAREL**, **SpotTool+** and
 **HandlingTool** are trademarks of FANUC Corporation. This project is not endorsed by,
 affiliated with, or supported by FANUC. Use it on your own equipment at your own risk.
+
+---
+
+## AI assistance
+
+AI tools were used to assist in building RUKUS. Every change is reviewed and tested by the
+RUKUS team, who are responsible for it.
